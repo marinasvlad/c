@@ -39,8 +39,7 @@ void InsertNode(Nod* &nod, int Valoare)
 
 void Afisare(Nod* &nod)
     {
-        cout << " " << nod->Data << endl;
-        cout << " / " <<"   "<<" \ " << endl ;
+        cout << nod->Data << endl;
         if(nod->Stanga != NULL)
             Afisare(nod->Stanga);
 
