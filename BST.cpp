@@ -1,122 +1,210 @@
-#include <iostream>
-
+#include<iostream>
+#include<fstream>
 using namespace std;
+class node
+{
+    friend class BST;
+    int data;
+    node* left, *right;
+};
 
-struct Nod
+class BST
+{
+    node *root;
+
+    node* insert(int x, node* t)
     {
-    int Data;
-    Nod *Dreapta, *Stanga;
-    };
-
-
-
-Nod *Rad = NULL;
-
-
-
-void SetNode(Nod* &nod,int Valoare)
-    {
-    Nod *new_nod = new Nod;
-    new_nod->Data = Valoare;
-    new_nod->Stanga = NULL;
-    new_nod->Dreapta = NULL;
-    nod = new_nod;
+        if(t == NULL)
+        {
+            t = new node;
+            t->data = x;
+            t->left = t->right = NULL;
+        }
+        else if(x < t->data)
+            t->left = insert(x, t->left);
+        else if(x > t->data)
+            t->right = insert(x, t->right);
+        return t;
     }
 
-
-
-void InsertNode(Nod* &nod, int Valoare)
+    node* findMin(node* t)
     {
-        if(nod == NULL)
-            SetNode(nod,Valoare);
-        else if(Valoare <= nod->Data)
-            InsertNode(nod->Stanga,Valoare);
-        else if(Valoare >= nod->Data)
-            InsertNode(nod->Dreapta,Valoare);
-    }
-
-
-
-void Afisare(Nod* &nod)
-    {
-        cout << nod->Data << endl;
-        if(nod->Stanga != NULL)
-            Afisare(nod->Stanga);
-
-        if(nod->Dreapta != NULL)
-            Afisare(nod->Dreapta);
-    }
-
-
-
-Nod *GasesteMin(Nod* &nod)
-    {
-        if(nod->Stanga != NULL)
-            GasesteMin(nod->Stanga);
+        if(t == NULL)
+            return NULL;
+        else if(t->left == NULL)
+            return t;
         else
-            return nod;
+            return findMin(t->left);
     }
 
-
-Nod *GasesteNod(Nod* &nod, int Valoare)
-{
-    if(Valoare == nod->Data)
-        return nod;
-    else if(Valoare > nod->Data)
-        GasesteNod(nod->Dreapta,Valoare);
-    else if(Valoare < nod->Data)
-        GasesteNod(nod->Stanga,Valoare);
-}
-
-void StergeNod(Nod* &nod,int Valoare)
-{
-
-    if(nod->Dreapta == NULL && nod->Stanga == NULL && Valoare == nod->Data)
-        nod = NULL;
-    else if (nod->Dreapta == NULL && Valoare == nod->Data)
+    node* findMax(node* t)
     {
-        nod = nod->Stanga;
+        if(t == NULL)
+            return NULL;
+        else if(t->right == NULL)
+            return t;
+        else
+            return findMax(t->right);
     }
-     else if (nod->Stanga == NULL && Valoare == nod->Data)
-    {
-        nod = nod->Dreapta;
-    }
-    else if(Valoare == nod->Data)
-    {
-        Nod *del_nod = GasesteMin(nod->Dreapta);
-        nod->Data = del_nod->Data;
-        StergeNod(nod->Dreapta,nod->Data);
-    }
-    else if(Valoare > nod->Data)
-        StergeNod(nod->Dreapta,Valoare);
-    else if(Valoare < nod->Data)
-        StergeNod(nod->Stanga,Valoare);
 
-}
+    node* remove(int x, node* t)
+    {
+        node* temp;
+        if(t == NULL)
+            return NULL;
+        else if(x < t->data)
+            t->left = remove(x, t->left);
+        else if(x > t->data)
+            t->right = remove(x, t->right);
+        else if(t->left && t->right)
+        {
+            temp = findMin(t->right);
+            t->data = temp->data;
+            t->right = remove(t->data, t->right);
+        }
+        else
+        {
+            temp = t;
+            if(t->left == NULL)
+                t = t->right;
+            else if(t->right == NULL)
+                t = t->left;
+            delete temp;
+        }
 
+        return t;
+    }
+
+    void inorder(node* t)
+    {
+        if(t == NULL)
+            return;
+        inorder(t->left);
+        cout << t->data << " ";
+        inorder(t->right);
+    }
+
+    int maxDepth(node* node)
+    {
+        if (node==NULL)
+           return 0;
+        else
+        {
+           int lDepth = maxDepth(node->left);
+           int rDepth = maxDepth(node->right);
+
+           if (lDepth > rDepth)
+               return(lDepth+1);
+           else return(rDepth+1);
+        }
+    }
+
+    void leaves(node* t)
+    {
+        if(t == NULL)
+            return;
+        if (t -> left == NULL && t -> right == NULL)
+            cout << t->data << " ";
+        leaves(t -> left);
+        leaves(t -> right);
+    }
+
+    node* makeEmpty(node* t)
+    {
+        if(t == NULL)
+            return NULL;
+        {
+            makeEmpty(t->left);
+            makeEmpty(t->right);
+            delete t;
+        }
+        return NULL;
+    }
+
+public:
+
+    BST()
+    {
+        root = NULL;
+    }
+
+    ~BST()
+    {
+        root = makeEmpty(root);
+    }
+
+    friend istream &operator>> (istream &in, BST &t)
+    {
+        int n, x;
+        in >> n;
+        for (int i = 0; i < n; i++)
+        {
+            in >> x;
+            t + x;
+        }
+    }
+
+    void operator + (int x)
+    {
+        root = insert (x, root);
+    }
+
+    void leaves()
+    {
+        cout << "Frunzele arborelui sunt : ";
+        leaves(root);
+        cout << endl;
+    }
+
+    void remove(int x)
+    {
+        root = remove(x, root);
+        cout << "Se sterge nodul " << x <<"." << endl << endl;
+    }
+
+    void height()
+    {
+        cout << "Inaltimea arborelui este: ";
+        cout << maxDepth(root);
+        cout << endl << endl;
+    }
+
+    void print(ostream &out, node *curr)
+    {
+        if(curr)
+        {
+            print(out, curr->left);
+            out << curr->data << " ";
+            print(out, curr->right);
+        }
+    }
+
+    friend ostream & operator<<(ostream &out, BST &t)
+    {
+        out << "Parcurgerea in inordine a arborelui este : ";
+        t.print(out, t.root);
+        out << endl << endl;
+
+        return out;
+    }
+
+};
 
 int main()
 {
-    InsertNode(Rad,25);
-    InsertNode(Rad,15);
-    InsertNode(Rad,50);
-    InsertNode(Rad,10);
-    InsertNode(Rad,22);
-    InsertNode(Rad,35);
-    InsertNode(Rad,70);
-    InsertNode(Rad,4);
-    InsertNode(Rad,12);
-    InsertNode(Rad,18);
-    InsertNode(Rad,24);
-    InsertNode(Rad,31);
-    InsertNode(Rad,44);
-    InsertNode(Rad,66);
-    InsertNode(Rad,90);
+    ifstream fin ("date.in");
 
-    Afisare(Rad);
-    cout << endl;
-    StergeNod(Rad,15);
+    BST t;
 
-    Afisare(Rad);
-    return 0;
+    fin >> t;
+
+    cout << t;
+
+    t.height();
+
+    t.remove (23);
+
+    cout << t;
+
+    t.leaves();
 }
