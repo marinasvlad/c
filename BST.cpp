@@ -169,13 +169,13 @@ public:
         cout << endl << endl;
     }
 
-    void print(ostream &out, node *curr)
+    void print(ostream &out, node *t)
     {
-        if(curr)
+        if(t)
         {
-            print(out, curr->left);
-            out << curr->data << " ";
-            print(out, curr->right);
+            print(out, t->left);
+            out << t->data << " ";
+            print(out, t->right);
         }
     }
 
